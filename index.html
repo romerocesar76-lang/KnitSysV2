@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KnitSys — Sistema de Gestión</title>
+    <link href="./KnitSys_files/css2" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-mark">
+            <div class="logo-icon">🧶</div>
+            <div>
+                <div class="logo-text">KnitSys</div>
+                <div class="logo-sub">Gestión de producción</div>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="sidebar-section-label">Principal</div>
+        <div class="nav-item active" onclick="KnitSys.navigate('home', this)">
+            <span class="nav-icon">🏠</span> Inicio
+        </div>
+        <div class="nav-item" onclick="KnitSys.navigate('plan', this)">
+            <span class="nav-icon">📋</span> Plan de trabajo
+        </div>
+        <div class="nav-item" onclick="KnitSys.navigate('desarrollos', this)">
+            <span class="nav-icon">✏️</span> Desarrollos
+        </div>
+
+        <div class="sidebar-section-label">Inventario</div>
+        <div class="nav-item" onclick="KnitSys.navigate('hilados', this)">
+            <span class="nav-icon">🧵</span> Hilados
+        </div>
+        <div class="nav-item" onclick="KnitSys.navigate('stock', this)">
+            <span class="nav-icon">📦</span> Stock
+        </div>
+
+        <div class="sidebar-section-label">Gestión</div>
+        <div class="nav-item" onclick="KnitSys.navigate('contactos', this)">
+            <span class="nav-icon">👥</span> Contactos
+        </div>
+
+        <hr class="nav-divider">
+        <div class="nav-item" onclick="KnitSys.navigate('config', this)">
+            <span class="nav-icon">⚙️</span> Configuración
+        </div>
+        <div class="nav-item nav-danger" onclick="KnitSys.salir()">
+            <span class="nav-icon">⏻</span> Salir
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="avatar">MA</div>
+        <div>
+            <div class="sidebar-user-name">M. Andrade</div>
+            <div class="sidebar-user-role">Admin</div>
+        </div>
+    </div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div id="main">
+    <!-- TOP BAR -->
+    <header id="topbar">
+        <div>
+            <div class="topbar-title" id="topbar-title">Inicio</div>
+            <div class="topbar-breadcrumb" id="topbar-breadcrumb">KnitSys / Inicio</div>
+        </div>
+        <div class="topbar-actions">
+            <span class="topbar-badge">🟢 Conectado</span>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div id="content">
+
+        <!-- ══ HOME ══ -->
+        <div class="module active" id="mod-home">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">👥</div>
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">Contactos</div>
+                    <div class="stat-change">↑ 3 este mes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">📦</div>
+                    <div class="stat-value">1.240</div>
+                    <div class="stat-label">Unidades en stock</div>
+                    <div class="stat-change">↑ 120 esta semana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">🧵</div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Tipos de hilado</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">📋</div>
+                    <div class="stat-value">6</div>
+                    <div class="stat-label">Órdenes activas</div>
+                    <div class="stat-change" style="color:var(--warning)">2 próximas a vencer</div>
+                </div>
+            </div>
+
+            <p class="section-title">Accesos rápidos</p>
+            <div class="quick-access">
+                <div class="quick-card" onclick="KnitSys.navigate('contactos', document.querySelector('[onclick*=contactos]'))">
+                    <div class="quick-card-icon">👥</div>
+                    <div class="quick-card-label">Contactos</div>
+                </div>
+                <div class="quick-card" onclick="KnitSys.navigate('plan', document.querySelector('[onclick*=plan]'))">
+                    <div class="quick-card-icon">📋</div>
+                    <div class="quick-card-label">Plan de trabajo</div>
+                </div>
+                <div class="quick-card" onclick="KnitSys.navigate('hilados', document.querySelector('[onclick*=hilados]'))">
+                    <div class="quick-card-icon">🧵</div>
+                    <div class="quick-card-label">Hilados</div>
+                </div>
+                <div class="quick-card" onclick="KnitSys.navigate('stock', document.querySelector('[onclick*=stock]'))">
+                    <div class="quick-card-icon">📦</div>
+                    <div class="quick-card-label">Stock</div>
+                </div>
+                <div class="quick-card" onclick="KnitSys.navigate('desarrollos', document.querySelector('[onclick*=desarrollos]'))">
+                    <div class="quick-card-icon">✏️</div>
+                    <div class="quick-card-label">Desarrollos</div>
+                </div>
+                <div class="quick-card" onclick="KnitSys.navigate('config', document.querySelector('[onclick*=config]'))">
+                    <div class="quick-card-icon">⚙️</div>
+                    <div class="quick-card-label">Configuración</div>
+                </div>
+            </div>
+
+            <div class="card mt-16">
+                <div class="card-header">
+                    <span class="card-title">Actividad reciente</span>
+                    <span class="text-muted">Últimas 24 hs</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr>
+                            <th>Evento</th><th>Módulo</th><th>Usuario</th><th>Fecha/Hora</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td>Nuevo contacto: Textiles SA</td><td><span class="pill pill-blue">Contactos</span></td><td>M. Andrade</td><td>Hoy 10:42</td></tr>
+                            <tr><td>Stock actualizado — Buzo T.M</td><td><span class="pill pill-green">Stock</span></td><td>L. Gómez</td><td>Hoy 09:15</td></tr>
+                            <tr><td>Orden #0024 iniciada</td><td><span class="pill pill-orange">Plan</span></td><td>M. Andrade</td><td>Hoy 08:30</td></tr>
+                            <tr><td>Ingreso hilado Merino 4/16</td><td><span class="pill pill-gray">Hilados</span></td><td>L. Gómez</td><td>Ayer 17:55</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ CONTACTOS ══ -->
+        <div class="module" id="mod-contactos">
+            <div class="card">
+                <div class="tabs" id="contactos-tabs">
+                    <div class="tab active" onclick="KnitSys.switchTab('contactos', 'empresas', this)">🏢 Empresas</div>
+                    <div class="tab" onclick="KnitSys.switchTab('contactos', 'individuos', this)">👤 Individuos</div>
+                </div>
+
+                <!-- Tab Empresas -->
+                <div class="tab-content active" id="contactos-tab-empresas">
+                    <div class="search-bar" style="border-radius:0; background:var(--surface-2);">
+                        <div class="search-input-wrap">
+                            <span class="search-icon">🔍</span>
+                            <input class="search-input" placeholder="Buscar empresa..." oninput="KnitSys.filterTable('tbl-empresas', this.value)">
+                        </div>
+                        <div style="flex:1"></div>
+                        <button class="btn btn-primary btn-sm" onclick="KnitSys.openModal('modal-empresa')">+ Nueva empresa</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="tbl-empresas">
+                            <thead><tr>
+                                <th>Nombre</th><th>CUIT / RUT / NIF</th><th>Condición fiscal</th><th>Actividad</th><th>País</th><th>Acciones</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr><td><strong>Textiles Andina SA</strong></td><td class="text-muted" style="font-family:var(--font-mono)">20-12345678-9</td><td><span class="pill pill-green">Responsable Inscripto</span></td><td>Fabricación de indumentaria</td><td>🇦🇷 AR</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando empresa...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Empresa eliminada','danger')">🗑️ Eliminar</button></div></td></tr>
+                                <tr><td><strong>Lanas del Sur SRL</strong></td><td class="text-muted" style="font-family:var(--font-mono)">30-98765432-1</td><td><span class="pill pill-blue">Monotributo</span></td><td>Comercio mayorista de hilados</td><td>🇦🇷 AR</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando empresa...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Empresa eliminada','danger')">🗑️ Eliminar</button></div></td></tr>
+                                <tr><td><strong>Tejidos Colón</strong></td><td class="text-muted" style="font-family:var(--font-mono)">33-11223344-5</td><td><span class="pill pill-green">Responsable Inscripto</span></td><td>Producción textil</td><td>🇦🇷 AR</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando empresa...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Empresa eliminada','danger')">🗑️ Eliminar</button></div></td></tr>
+                                <tr><td><strong>Global Yarns Ltd.</strong></td><td class="text-muted" style="font-family:var(--font-mono)">GB-123456789</td><td><span class="pill pill-gray">Exento</span></td><td>Importación de materias primas</td><td>🇬🇧 GB</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando empresa...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Empresa eliminada','danger')">🗑️ Eliminar</button></div></td></tr>
+                                <tr><td><strong>Modas Bariloche</strong></td><td class="text-muted" style="font-family:var(--font-mono)">27-44556677-3</td><td><span class="pill pill-blue">Monotributo</span></td><td>Venta minorista de prendas</td><td>🇦🇷 AR</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando empresa...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Empresa eliminada','danger')">🗑️ Eliminar</button></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Individuos -->
+                <div class="tab-content" id="contactos-tab-individuos">
+                    <div class="search-bar" style="border-radius:0; background:var(--surface-2);">
+                        <div class="search-input-wrap">
+                            <span class="search-icon">🔍</span>
+                            <input class="search-input" placeholder="Buscar contacto..." oninput="KnitSys.filterTable('tbl-individuos', this.value)">
+                        </div>
+                        <div style="flex:1"></div>
+                        <button class="btn btn-primary btn-sm" onclick="KnitSys.openModal('modal-contacto')">+ Nuevo contacto</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="tbl-individuos">
+                            <thead><tr>
+                                <th>Nombre</th><th>Apellido</th><th>Empresa principal</th><th>Tipo</th><th>Correo</th><th>Teléfono</th><th>Acciones</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr><td>Laura</td><td>Gómez</td><td>Textiles Andina SA</td><td><span class="pill pill-blue">Proveedora</span></td><td>lgomez@textiles.com</td><td>+54 11 4321-0000</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando contacto...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Contacto eliminado','danger')">🗑️</button></div></td></tr>
+                                <tr><td>Carlos</td><td>Ibarra</td><td>Lanas del Sur SRL</td><td><span class="pill pill-green">Cliente</span></td><td>c.ibarra@lanassur.com</td><td>+54 351 555-1234</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando contacto...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Contacto eliminado','danger')">🗑️</button></div></td></tr>
+                                <tr><td>Marta</td><td>Pereira</td><td>—</td><td><span class="pill pill-orange">Operaria</span></td><td>mpereira@knitsys.ar</td><td>+54 11 2233-4455</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando contacto...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Contacto eliminado','danger')">🗑️</button></div></td></tr>
+                                <tr><td>Jorge</td><td>Villanueva</td><td>Global Yarns Ltd.</td><td><span class="pill pill-blue">Proveedora</span></td><td>j.villanueva@globalyarns.co.uk</td><td>+44 20 7946-0958</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando contacto...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Contacto eliminado','danger')">🗑️</button></div></td></tr>
+                                <tr><td>Ana</td><td>Rondón</td><td>Modas Bariloche</td><td><span class="pill pill-green">Cliente</span></td><td>ardon@modasbari.com</td><td>+54 294 445-6789</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando contacto...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Contacto eliminado','danger')">🗑️</button></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ HILADOS ══ -->
+        <div class="module" id="mod-hilados">
+            <div class="card">
+                <div class="search-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input class="search-input" placeholder="Buscar hilado..." oninput="KnitSys.filterTable('tbl-hilados', this.value)">
+                    </div>
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary btn-sm" onclick="KnitSys.openModal('modal-hilado')">+ Nuevo hilado</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="tbl-hilados">
+                        <thead><tr>
+                            <th>Nombre</th><th>Tipo / Composición</th><th>Color</th><th>Stock (kg)</th><th>Estado</th><th>Acciones</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td><strong>Merino 4/16</strong></td><td>Lana merina</td><td><span class="pill pill-gray">🟤 Tostado</span></td><td>48</td><td><span class="pill pill-green">OK</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando hilado...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Hilado eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Acrílico 2/30</strong></td><td>100% Acrílico</td><td><span class="pill pill-gray">⚫ Negro</span></td><td>120</td><td><span class="pill pill-green">OK</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando hilado...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Hilado eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Shetland Mix</strong></td><td>Lana / Acrílico 50/50</td><td><span class="pill pill-gray">⬜ Crudo</span></td><td>9</td><td><span class="pill pill-red">Bajo stock</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando hilado...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Hilado eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Algodón Peinado</strong></td><td>100% Algodón</td><td><span class="pill pill-gray">🔵 Azul marino</span></td><td>75</td><td><span class="pill pill-green">OK</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando hilado...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Hilado eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Cashmerino</strong></td><td>Cachemira / Merino</td><td><span class="pill pill-gray">🟣 Burdeos</span></td><td>3</td><td><span class="pill pill-red">Bajo stock</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando hilado...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Hilado eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Viscosa Brillante</strong></td><td>100% Viscosa</td><td><span class="pill pill-gray">🔴 Rojo</span></td><td>32</td><td><span class="pill pill-green">OK</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando hilado...','success')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Hilado eliminado','danger')">🗑️</button></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ STOCK ══ -->
+        <div class="module" id="mod-stock">
+            <div class="card">
+                <div class="search-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input class="search-input" placeholder="Buscar producto..." oninput="KnitSys.filterTable('tbl-stock', this.value)">
+                    </div>
+                    <div class="filter-bar" style="padding:0; border:none; background:none; margin-left:8px;">
+                        <select class="filter-select" onchange="KnitSys.filterTable('tbl-stock', this.value)">
+                            <option value="">Todos los talles</option>
+                            <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+                        </select>
+                        <select class="filter-select" onchange="KnitSys.filterTable('tbl-stock', this.value)">
+                            <option value="">Todos los colores</option>
+                            <option>Negro</option><option>Crudo</option><option>Azul marino</option><option>Burdeos</option><option>Tostado</option>
+                        </select>
+                    </div>
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary btn-sm" onclick="KnitSys.toast('Función próximamente','success')">+ Nuevo producto</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="tbl-stock">
+                        <thead><tr>
+                            <th>Código</th><th>Nombre</th><th>Talle</th><th>Color</th><th>Cantidad</th><th>Estado</th><th>Acciones</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">BUZ-001</td><td>Buzo cuello redondo</td><td>M</td><td>Negro</td><td>45</td><td><span class="pill pill-green">Disponible</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">BUZ-001</td><td>Buzo cuello redondo</td><td>L</td><td>Negro</td><td>30</td><td><span class="pill pill-green">Disponible</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">CAR-005</td><td>Cardigan botones</td><td>S</td><td>Crudo</td><td>8</td><td><span class="pill pill-orange">Bajo stock</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">CAR-005</td><td>Cardigan botones</td><td>M</td><td>Burdeos</td><td>22</td><td><span class="pill pill-green">Disponible</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">VES-012</td><td>Vestido manga larga</td><td>S</td><td>Azul marino</td><td>0</td><td><span class="pill pill-red">Sin stock</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">VES-012</td><td>Vestido manga larga</td><td>M</td><td>Tostado</td><td>15</td><td><span class="pill pill-green">Disponible</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">PUL-003</td><td>Pullover escote en V</td><td>XL</td><td>Negro</td><td>5</td><td><span class="pill pill-orange">Bajo stock</span></td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando producto...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PLAN ══ -->
+        <div class="module" id="mod-plan">
+            <div class="card">
+                <div class="search-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input class="search-input" placeholder="Buscar orden..." oninput="KnitSys.filterTable('tbl-plan', this.value)">
+                    </div>
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary btn-sm" onclick="KnitSys.toast('Nueva orden creada','success')">+ Nueva orden</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="tbl-plan">
+                        <thead><tr>
+                            <th>Orden</th><th>Producto</th><th>Estado</th><th>Fecha inicio</th><th>Fecha fin</th><th>Responsable</th><th>Acciones</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">#0024</td><td>Buzo cuello redondo — 60u M/L</td><td><span class="pill pill-orange">En proceso</span></td><td>12/05/2025</td><td>26/05/2025</td><td>Marta P.</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando orden...','success')">✏️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">#0023</td><td>Cardigan botones — 30u S/M</td><td><span class="pill pill-orange">En proceso</span></td><td>05/05/2025</td><td>20/05/2025</td><td>M. Andrade</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando orden...','success')">✏️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">#0022</td><td>Pullover escote en V — 25u XL</td><td><span class="pill pill-blue">Planificada</span></td><td>20/05/2025</td><td>03/06/2025</td><td>Marta P.</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando orden...','success')">✏️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">#0021</td><td>Vestido manga larga — 40u S</td><td><span class="pill pill-green">Finalizada</span></td><td>01/04/2025</td><td>28/04/2025</td><td>L. Gómez</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando orden...','success')">✏️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">#0020</td><td>Buzo cuello redondo — 80u XS/S</td><td><span class="pill pill-green">Finalizada</span></td><td>10/03/2025</td><td>01/04/2025</td><td>M. Andrade</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando orden...','success')">✏️</button></div></td></tr>
+                            <tr><td class="text-muted" style="font-family:var(--font-mono)">#0019</td><td>Chaleco sin mangas — 20u M</td><td><span class="pill pill-red">Demorada</span></td><td>15/04/2025</td><td>10/05/2025</td><td>L. Gómez</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando orden...','success')">✏️</button></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ DESARROLLOS ══ -->
+        <div class="module" id="mod-desarrollos">
+            <div class="card">
+                <div class="search-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input class="search-input" placeholder="Buscar desarrollo..." oninput="KnitSys.filterTable('tbl-dev', this.value)">
+                    </div>
+                    <div style="flex:1"></div>
+                    <button class="btn btn-primary btn-sm" onclick="KnitSys.toast('Nuevo desarrollo creado','success')">+ Nuevo desarrollo</button>
+                </div>
+                <div class="table-wrap">
+                    <table id="tbl-dev">
+                        <thead><tr>
+                            <th>Nombre</th><th>Descripción</th><th>Estado</th><th>Responsable</th><th>Fecha</th><th>Acciones</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td><strong>Buzo oversize v2</strong></td><td>Nueva moldería para talle único</td><td><span class="pill pill-orange">En desarrollo</span></td><td>M. Andrade</td><td>Abr 2025</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Cardigan tejido abierto</strong></td><td>Punto calado, hilo Cashmerino</td><td><span class="pill pill-blue">Muestra</span></td><td>L. Gómez</td><td>Mar 2025</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Chaleco reversible</strong></td><td>Dos caras: liso / trenzado</td><td><span class="pill pill-green">Aprobado</span></td><td>M. Andrade</td><td>Feb 2025</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Vestido punto fantasía</strong></td><td>Punto jacquard, colección invierno</td><td><span class="pill pill-gray">Pausado</span></td><td>Marta P.</td><td>Ene 2025</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                            <tr><td><strong>Pullover infantil</strong></td><td>Línea niños 2-8 años</td><td><span class="pill pill-orange">En desarrollo</span></td><td>L. Gómez</td><td>May 2025</td><td><div class="flex-gap"><button class="btn btn-edit btn-sm" onclick="KnitSys.toast('Editando...','success')">✏️</button><button class="btn btn-danger btn-sm" onclick="KnitSys.toast('Eliminado','danger')">🗑️</button></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ CONFIG ══ -->
+        <div class="module" id="mod-config">
+            <div class="config-grid">
+                <div class="config-section">
+                    <div class="config-section-header"><div class="config-section-title">👤 Mi cuenta</div></div>
+                    <div class="config-item"><div><div class="config-item-label">Nombre</div><div class="config-item-value">M. Andrade</div></div><button class="btn btn-secondary btn-sm" onclick="KnitSys.toast('Editando perfil...','success')">Editar</button></div>
+                    <div class="config-item"><div><div class="config-item-label">Correo</div><div class="config-item-value">andrade@knitsys.ar</div></div><button class="btn btn-secondary btn-sm" onclick="KnitSys.toast('Editando...','success')">Editar</button></div>
+                    <div class="config-item"><div><div class="config-item-label">Contraseña</div><div class="config-item-value">••••••••</div></div><button class="btn btn-secondary btn-sm" onclick="KnitSys.toast('Cambiando contraseña...','success')">Cambiar</button></div>
+                    <div class="config-item"><div><div class="config-item-label">Rol</div><div class="config-item-value">admin</div></div><span class="pill pill-blue">Admin</span></div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header"><div class="config-section-title">👥 Usuarios y roles</div></div>
+                    <div class="config-item"><div><div class="config-item-label">M. Andrade</div><div class="config-item-value">admin</div></div><span class="pill pill-blue">Admin</span></div>
+                    <div class="config-item"><div><div class="config-item-label">L. Gómez</div><div class="config-item-value">operator</div></div><span class="pill pill-gray">Operator</span></div>
+                    <div class="config-item"><div><div class="config-item-label">Marta P.</div><div class="config-item-value">operator</div></div><span class="pill pill-gray">Operator</span></div>
+                    <div class="config-item" style="justify-content:center; padding: 10px 18px;"><button class="btn btn-primary btn-sm" onclick="KnitSys.toast('Invitando usuario...','success')">+ Invitar usuario</button></div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header"><div class="config-section-title">⚙️ Parámetros generales</div></div>
+                    <div class="config-item"><span class="config-item-label">País por defecto</span><span class="config-item-value">🇦🇷 AR</span></div>
+                    <div class="config-item"><span class="config-item-label">Moneda</span><span class="config-item-value">ARS $</span></div>
+                    <div class="config-item"><span class="config-item-label">Stock mínimo (kg)</span><span class="config-item-value">10</span></div>
+                    <div class="config-item"><span class="config-item-label">Zona horaria</span><span class="config-item-value">America/Buenos_Aires</span></div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header"><div class="config-section-title">🔔 Preferencias</div></div>
+                    <div class="config-item"><span class="config-item-label">Notificaciones de stock</span><label class="toggle"><input type="checkbox" checked=""><span class="toggle-slider"></span></label></div>
+                    <div class="config-item"><span class="config-item-label">Alertas de vencimiento</span><label class="toggle"><input type="checkbox" checked=""><span class="toggle-slider"></span></label></div>
+                    <div class="config-item"><span class="config-item-label">Modo oscuro</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                    <div class="config-item"><span class="config-item-label">Mostrar auditoría</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header"><div class="config-section-title">🗄️ Base de datos</div></div>
+                    <div class="config-item"><span class="config-item-label">Motor</span><span class="config-item-value">MySQL 8.0 (local)</span></div>
+                    <div class="config-item"><span class="config-item-label">Host</span><span class="config-item-value">127.0.0.1:3306</span></div>
+                    <div class="config-item"><span class="config-item-label">Estado</span><span class="pill pill-green">Conectado</span></div>
+                    <div class="config-item" style="gap:8px; flex-direction:column; align-items:flex-start;">
+                        <div class="flex-gap">
+                            <button class="btn btn-secondary btn-sm" onclick="KnitSys.toast('Test de conexión OK ✓','success')">Test conexión</button>
+                            <button class="btn btn-secondary btn-sm" onclick="KnitSys.toast('Backup generado','success')">Backup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+
+    <!-- STATUS BAR -->
+    <footer id="statusbar">
+        <div class="status-item"><div class="status-dot"></div> MySQL conectado</div>
+        <div class="status-sep"></div>
+        <div class="status-item">Usuario: M. Andrade (admin)</div>
+        <div class="status-sep"></div>
+        <div class="status-item" id="status-time">03:27:34 a. m.</div>
+        <div class="status-sep"></div>
+        <div class="status-item">v1.0.0</div>
+    </footer>
+</div><!-- /main -->
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Modal empresa -->
+<div class="modal-backdrop" id="modal-empresa">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Nueva empresa</span>
+            <button class="modal-close" onclick="KnitSys.closeModal('modal-empresa')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <input class="form-input" placeholder="Nombre de la empresa">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CUIT / RUT / NIF *</label>
+                    <input class="form-input" placeholder="20-12345678-9">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Condición fiscal</label>
+                    <select class="form-input">
+                        <option>Responsable Inscripto</option>
+                        <option>Monotributo</option>
+                        <option>Exento</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">País</label>
+                    <select class="form-input">
+                        <option>🇦🇷 Argentina</option>
+                        <option>🇧🇷 Brasil</option>
+                        <option>🇺🇾 Uruguay</option>
+                        <option>🇬🇧 Reino Unido</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Actividad económica</label>
+                <input class="form-input" placeholder="Ej: Fabricación de indumentaria">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Sitio web</label>
+                <input class="form-input" placeholder="https://...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="KnitSys.closeModal('modal-empresa')">Cancelar</button>
+            <button class="btn btn-primary" onclick="KnitSys.closeModal('modal-empresa'); KnitSys.toast('Empresa guardada correctamente','success')">Guardar empresa</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal contacto -->
+<div class="modal-backdrop" id="modal-contacto">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Nuevo contacto</span>
+            <button class="modal-close" onclick="KnitSys.closeModal('modal-contacto')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <input class="form-input" placeholder="Nombre">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellido *</label>
+                    <input class="form-input" placeholder="Apellido">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Correo</label>
+                    <input class="form-input" type="email" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input class="form-input" placeholder="+54 11 ...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Tipo de contacto</label>
+                    <select class="form-input">
+                        <option>Cliente</option>
+                        <option>Proveedora</option>
+                        <option>Operaria</option>
+                        <option>Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Empresa principal</label>
+                    <input class="form-input" placeholder="Buscar empresa...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notas</label>
+                <input class="form-input" placeholder="Observaciones...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="KnitSys.closeModal('modal-contacto')">Cancelar</button>
+            <button class="btn btn-primary" onclick="KnitSys.closeModal('modal-contacto'); KnitSys.toast('Contacto guardado correctamente','success')">Guardar contacto</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal hilado -->
+<div class="modal-backdrop" id="modal-hilado">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Nuevo hilado</span>
+            <button class="modal-close" onclick="KnitSys.closeModal('modal-hilado')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <input class="form-input" placeholder="Ej: Merino 4/16">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo / Composición</label>
+                    <input class="form-input" placeholder="100% Lana merina">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <input class="form-input" placeholder="Tostado, Negro...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stock inicial (kg)</label>
+                    <input class="form-input" type="number" placeholder="0" min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Proveedor</label>
+                <input class="form-input" placeholder="Buscar empresa proveedora...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="KnitSys.closeModal('modal-hilado')">Cancelar</button>
+            <button class="btn btn-primary" onclick="KnitSys.closeModal('modal-hilado'); KnitSys.toast('Hilado guardado correctamente','success')">Guardar hilado</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Script externo -->
+<script src="js/app.js"></script>
+</body>
+</html>

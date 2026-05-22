@@ -3,8 +3,9 @@
  * Sistema de Gestión de Contactos Empresariales
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+import { empresaService, contactoService } from './services/api'
 
 // ═══════════════════════════════════════════
 // COMPONENTES DE LA APLICACIÓN
@@ -14,6 +15,48 @@ function App() {
   const [activeModule, setActiveModule] = useState('home')
   const [activeTab, setActiveTab] = useState('all')
 
+  // ═══ Estados para datos reales desde API ═══
+  const [empresas, setEmpresas] = useState([])
+  const [contactos, setContactos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // ═══ Cargar datos desde la API ═══
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        // Cargar empresas
+        const empresasResponse = await empresaService.getAll()
+        setEmpresas(empresasResponse.data || [])
+
+        // Cargar contactos
+        const contactosResponse = await contactoService.getAll()
+        setContactos(contactosResponse.data || [])
+
+        setError(null)
+      } catch (err) {
+        console.error('Error cargando datos:', err)
+        setError('No se pudo conectar con el servidor. Verifica que el backend esté corriendo.')
+        // Mantener datos vacíos si hay error
+        setEmpresas([])
+        setContactos([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [])
+
+  // ═══ Calcular estadísticas ═══
+  const stats = {
+    empresas: empresas.length,
+    contactos: contactos.length,
+    activos: empresas.filter(e => e.activo).length,
+    inactivos: empresas.filter(e => !e.activo).length,
+  }
+
   // ═══ Navegación ═══
   const navItems = [
     { id: 'home', label: 'Inicio', icon: '🏠' },
@@ -22,35 +65,25 @@ function App() {
     { id: 'configuracion', label: 'Configuración', icon: '⚙️' },
   ]
 
-  // ═══ Datos de ejemplo ═══
-  const stats = {
-    empresas: 42,
-    contactos: 156,
-    activos: 38,
-    inactivos: 4,
-  }
-
-  const empresas = [
-    { id: 1, nombre: 'TechCorp S.A.', ruc: '20123456789', estado: 'Activo', contactos: 8 },
-    { id: 2, nombre: 'Innovatech Ltda.', ruc: '20987654321', estado: 'Activo', contactos: 5 },
-    { id: 3, nombre: 'Global Services Inc.', ruc: '20555666777', estado: 'Inactivo', contactos: 2 },
-  ]
-
-  const contactos = [
-    { id: 1, nombre: 'Juan Pérez', email: 'juan@techcorp.com', telefono: '+51 999 888 777', empresa: 'TechCorp S.A.', puesto: 'Gerente' },
-    { id: 2, nombre: 'María García', email: 'maria@innovatech.com', telefono: '+51 888 777 666', empresa: 'Innovatech Ltda.', puesto: 'Directora' },
-    { id: 3, nombre: 'Carlos López', email: 'carlos@techcorp.com', telefono: '+51 777 666 555', empresa: 'TechCorp S.A.', puesto: 'Analista' },
-  ]
-
   // ═══ Renderizar módulo activo ═══
   const renderModule = () => {
     switch (activeModule) {
       case 'home':
         return <HomeModule stats={stats} setActiveModule={setActiveModule} />
       case 'empresas':
-        return <EmpresasModule empresas={empresas} activeTab={activeTab} setActiveTab={setActiveTab} />
+        return <EmpresasModule 
+          empresas={empresas} 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab}
+          loading={loading}
+          error={error}
+        />
       case 'contactos':
-        return <ContactosModule contactos={contactos} />
+        return <ContactosModule 
+          contactos={contactos}
+          loading={loading}
+          error={error}
+        />
       case 'configuracion':
         return <ConfigModule />
       default:
@@ -205,7 +238,40 @@ function HomeModule({ stats, setActiveModule }) {
 // MÓDULO: EMPRESAS
 // ═══════════════════════════════════════════
 
-function EmpresasModule({ empresas, activeTab, setActiveTab }) {
+function EmpresasModule({ empresas, activeTab, setActiveTab, loading, error }) {
+  // ═══ Filtrar empresas por estado ═══
+  const filteredEmpresas = empresas.filter(empresa => {
+    if (activeTab === 'activas') return empresa.activo === 1 || empresa.activo === true
+    if (activeTab === 'inactivas') return empresa.activo === 0 || empresa.activo === false
+    return true // 'all' - mostrar todas
+  })
+
+  // ═══ Estado de carga ═══
+  if (loading) {
+    return (
+      <div className="module active">
+        <div className="card">
+          <div className="card-body" style={{ textAlign: 'center', padding: '40px' }}>
+            <p>Cargando empresas...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ═══ Mensaje de error ═══
+  if (error) {
+    return (
+      <div className="module active">
+        <div className="card">
+          <div className="card-body">
+            <p style={{ color: 'var(--danger)' }}>⚠️ {error}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="module active">
       <div className="card">
@@ -223,13 +289,13 @@ function EmpresasModule({ empresas, activeTab, setActiveTab }) {
         {/* Tabs */}
         <div className="tabs">
           <div className={`tab ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>
-            Todas
+            Todas ({empresas.length})
           </div>
           <div className={`tab ${activeTab === 'activas' ? 'active' : ''}`} onClick={() => setActiveTab('activas')}>
-            Activas
+            Activas ({empresas.filter(e => e.activo).length})
           </div>
           <div className={`tab ${activeTab === 'inactivas' ? 'active' : ''}`} onClick={() => setActiveTab('inactivas')}>
-            Inactivas
+            Inactivas ({empresas.filter(e => !e.activo).length})
           </div>
         </div>
 
@@ -246,24 +312,32 @@ function EmpresasModule({ empresas, activeTab, setActiveTab }) {
               </tr>
             </thead>
             <tbody>
-              {empresas.map(empresa => (
-                <tr key={empresa.id}>
-                  <td><strong>{empresa.nombre}</strong></td>
-                  <td>{empresa.ruc}</td>
-                  <td>
-                    <span className={`pill ${empresa.estado === 'Activo' ? 'pill-green' : 'pill-gray'}`}>
-                      {empresa.estado}
-                    </span>
-                  </td>
-                  <td>{empresa.contactos}</td>
-                  <td>
-                    <div className="flex-gap">
-                      <button className="btn btn-sm btn-edit">Editar</button>
-                      <button className="btn btn-sm btn-danger">Eliminar</button>
-                    </div>
+              {filteredEmpresas.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
+                    No hay empresas registradas
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredEmpresas.map(empresa => (
+                  <tr key={empresa.id}>
+                    <td><strong>{empresa.nombre}</strong></td>
+                    <td>{empresa.ruc || '-'}</td>
+                    <td>
+                      <span className={`pill ${empresa.activo ? 'pill-green' : 'pill-gray'}`}>
+                        {empresa.activo ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>{empresa.contactos_count || 0}</td>
+                    <td>
+                      <div className="flex-gap">
+                        <button className="btn btn-sm btn-edit">Editar</button>
+                        <button className="btn btn-sm btn-danger">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -276,7 +350,33 @@ function EmpresasModule({ empresas, activeTab, setActiveTab }) {
 // MÓDULO: CONTACTOS
 // ═══════════════════════════════════════════
 
-function ContactosModule({ contactos }) {
+function ContactosModule({ contactos, loading, error }) {
+  // ═══ Estado de carga ═══
+  if (loading) {
+    return (
+      <div className="module active">
+        <div className="card">
+          <div className="card-body" style={{ textAlign: 'center', padding: '40px' }}>
+            <p>Cargando contactos...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ═══ Mensaje de error ═══
+  if (error) {
+    return (
+      <div className="module active">
+        <div className="card">
+          <div className="card-body">
+            <p style={{ color: 'var(--danger)' }}>⚠️ {error}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="module active">
       <div className="card">
@@ -305,21 +405,29 @@ function ContactosModule({ contactos }) {
               </tr>
             </thead>
             <tbody>
-              {contactos.map(contacto => (
-                <tr key={contacto.id}>
-                  <td><strong>{contacto.nombre}</strong></td>
-                  <td>{contacto.email}</td>
-                  <td>{contacto.telefono}</td>
-                  <td>{contacto.empresa}</td>
-                  <td>{contacto.puesto}</td>
-                  <td>
-                    <div className="flex-gap">
-                      <button className="btn btn-sm btn-edit">Editar</button>
-                      <button className="btn btn-sm btn-danger">Eliminar</button>
-                    </div>
+              {contactos.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
+                    No hay contactos registrados
                   </td>
                 </tr>
-              ))}
+              ) : (
+                contactos.map(contacto => (
+                  <tr key={contacto.id}>
+                    <td><strong>{contacto.nombre}</strong></td>
+                    <td>{contacto.email || '-'}</td>
+                    <td>{contacto.telefono || '-'}</td>
+                    <td>{contacto.empresa_nombre || '-'}</td>
+                    <td>{contacto.cargo || '-'}</td>
+                    <td>
+                      <div className="flex-gap">
+                        <button className="btn btn-sm btn-edit">Editar</button>
+                        <button className="btn btn-sm btn-danger">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

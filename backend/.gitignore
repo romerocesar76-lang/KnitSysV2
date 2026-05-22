@@ -1,0 +1,35 @@
+# ═══════════════════════════════════════════
+# KnitSys Backend - Git Ignore
+# ═══════════════════════════════════════════
+
+# Dependencias
+node_modules/
+
+# Variables de entorno (¡NUNCA subir credenciales!)
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Coverage de tests
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/

@@ -12,7 +12,7 @@ class Empresa {
    * @returns {Promise<Array>} Lista de empresas
    */
   static async findAll(options = {}) {
-    const { page = 1, limit = 20, search = '', activo = true } = options;
+    const { page = 1, limit = 20, search = '', activo } = options;
     const offset = (page - 1) * limit;
     
     let sql = `

@@ -12,7 +12,7 @@ class Contacto {
    * @returns {Promise<Array>} Lista de contactos
    */
   static async findAll(options = {}) {
-    const { page = 1, limit = 20, search = '', tipoContactoId = null, activo = true } = options;
+    const { page = 1, limit = 20, search = '', tipoContactoId = null, activo } = options;
     const offset = (page - 1) * limit;
     
     let sql = `
@@ -34,7 +34,13 @@ class Contacto {
         (SELECT GROUP_CONCAT(correo SEPARATOR ', ') 
          FROM contacto_correos WHERE id_contacto = c.id AND es_principal = 1) as email_principal,
         (SELECT GROUP_CONCAT(telefono SEPARATOR ', ') 
-         FROM contacto_telefonos WHERE id_contacto = c.id AND es_principal = 1) as telefono_principal
+         FROM contacto_telefonos WHERE id_contacto = c.id AND es_principal = 1) as telefono_principal,
+        (SELECT e.nombre
+         FROM empresas e
+         INNER JOIN empresa_contacto ec_pr ON e.id = ec_pr.id_empresa
+         WHERE ec_pr.id_contacto = c.id AND e.borrado_en IS NULL
+         ORDER BY ec_pr.es_principal DESC, e.nombre ASC
+         LIMIT 1) as empresa_principal
       FROM contactos c
       LEFT JOIN tipos_contacto tc ON c.id_tipo_contacto = tc.id
       LEFT JOIN usuarios u1 ON c.creado_por = u1.id

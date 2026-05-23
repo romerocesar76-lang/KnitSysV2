@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════
+   KnitSys React — layout del contenedor #root
+   (styles.css asume aside + #main como hijos de body)
+   ═══════════════════════════════════════════ */
+
+body {
+  display: block;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#sidebar {
+  flex-shrink: 0;
+}
+
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  height: 100vh;
+}
+
+#content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+#topbar,
+#statusbar {
+  flex-shrink: 0;
+}
+
+.table-wrap,
+.module,
+.stats-grid,
+.quick-access,
+.config-grid {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  #sidebar {
+    display: none;
+  }
+
+  #content {
+    padding: 16px;
+  }
+}

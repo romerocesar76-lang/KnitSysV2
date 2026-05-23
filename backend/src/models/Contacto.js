@@ -30,7 +30,7 @@ class Contacto {
         tc.etiqueta as tipo_contacto_etiqueta,
         u1.nombre_mostrar as creado_por_nombre,
         u2.nombre_mostrar as actualizado_por_nombre,
-        COUNT(ec.id_empresa) as cantidad_empresas,
+        (SELECT COUNT(*) FROM empresa_contacto ec_cnt WHERE ec_cnt.id_contacto = c.id) as cantidad_empresas,
         (SELECT GROUP_CONCAT(correo SEPARATOR ', ') 
          FROM contacto_correos WHERE id_contacto = c.id AND es_principal = 1) as email_principal,
         (SELECT GROUP_CONCAT(telefono SEPARATOR ', ') 
@@ -45,7 +45,6 @@ class Contacto {
       LEFT JOIN tipos_contacto tc ON c.id_tipo_contacto = tc.id
       LEFT JOIN usuarios u1 ON c.creado_por = u1.id
       LEFT JOIN usuarios u2 ON c.actualizado_por = u2.id
-      LEFT JOIN empresa_contacto ec ON c.id = ec.id_contacto
       WHERE c.borrado_en IS NULL
     `;
     
@@ -67,11 +66,11 @@ class Contacto {
       params.push(activo ? 1 : 0);
     }
     
-    sql += ` GROUP BY c.id`;
+    const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+    const safeOffset = Math.max(0, parseInt(offset, 10) || 0);
     sql += ` ORDER BY c.apellido ASC, c.nombre ASC`;
-    sql += ` LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit), parseInt(offset));
-    
+    sql += ` LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+
     return await db.query(sql, params);
   }
 
@@ -187,7 +186,7 @@ class Contacto {
       creado_por || null
     ]);
     
-    return result[0].insertId;
+    return db.getInsertId(result);
   }
 
   /**
@@ -231,7 +230,7 @@ class Contacto {
       id
     ]);
     
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -247,7 +246,7 @@ class Contacto {
     `;
     
     const result = await db.query(sql, [id]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -264,7 +263,7 @@ class Contacto {
     `;
     
     const result = await db.query(sql, [activo ? 1 : 0, id]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -298,7 +297,7 @@ class Contacto {
       verificado ? 1 : 0
     ]);
     
-    return result[0].insertId;
+    return db.getInsertId(result);
   }
 
   /**
@@ -314,7 +313,7 @@ class Contacto {
     `;
     
     const result = await db.query(sql, [contactoId, emailId]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -348,7 +347,7 @@ class Contacto {
       es_principal ? 1 : 0
     ]);
     
-    return result[0].insertId;
+    return db.getInsertId(result);
   }
 
   /**
@@ -364,7 +363,7 @@ class Contacto {
     `;
     
     const result = await db.query(sql, [contactoId, telefonoId]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 }
 

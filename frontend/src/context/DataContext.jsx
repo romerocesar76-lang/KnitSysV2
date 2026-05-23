@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { contactoService, empresaService, healthService } from '../services/api'
 import { extractApiList } from '../utils/mapApi'
+import { getApiErrorMessage } from '../utils/apiErrors'
 
 const DataContext = createContext(null)
 
@@ -13,9 +14,10 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (options = {}) => {
+    const { silent = false } = options
     setLoading(true)
-    setError(null)
+    if (!silent) setError(null)
 
     try {
       const [empresasRes, contactosRes, healthRes] = await Promise.all([
@@ -31,12 +33,15 @@ export function DataProvider({ children }) {
       return { dbConnected: connected, error: null }
     } catch (err) {
       console.error('Error cargando datos KnitSys:', err)
-      const message =
-        'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en el puerto 3000.'
-      setError(message)
-      setEmpresas([])
-      setContactos([])
-      setDbConnected(false)
+      const message = err.response
+        ? getApiErrorMessage(err)
+        : 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo (puerto 3001).'
+      if (!silent) {
+        setError(message)
+        setEmpresas([])
+        setContactos([])
+        setDbConnected(false)
+      }
       return { dbConnected: false, error: message }
     } finally {
       setLoading(false)

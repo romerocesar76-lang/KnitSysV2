@@ -29,11 +29,10 @@ class Empresa {
         e.actualizado_en,
         u1.nombre_mostrar as creado_por_nombre,
         u2.nombre_mostrar as actualizado_por_nombre,
-        COUNT(ec.id_contacto) as cantidad_contactos
+        (SELECT COUNT(*) FROM empresa_contacto ec WHERE ec.id_empresa = e.id) as cantidad_contactos
       FROM empresas e
       LEFT JOIN usuarios u1 ON e.creado_por = u1.id
       LEFT JOIN usuarios u2 ON e.actualizado_por = u2.id
-      LEFT JOIN empresa_contacto ec ON e.id = ec.id_empresa
       WHERE e.borrado_en IS NULL
     `;
     
@@ -50,11 +49,11 @@ class Empresa {
       params.push(activo ? 1 : 0);
     }
     
-    sql += ` GROUP BY e.id`;
+    const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
+    const safeOffset = Math.max(0, parseInt(offset, 10) || 0);
     sql += ` ORDER BY e.nombre ASC`;
-    sql += ` LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit), parseInt(offset));
-    
+    sql += ` LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+
     return await db.query(sql, params);
   }
 
@@ -141,7 +140,7 @@ class Empresa {
       creado_por || null
     ]);
     
-    return result[0].insertId;
+    return db.getInsertId(result);
   }
 
   /**
@@ -185,7 +184,7 @@ class Empresa {
       id
     ]);
     
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -201,7 +200,7 @@ class Empresa {
     `;
     
     const result = await db.query(sql, [id]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -218,7 +217,7 @@ class Empresa {
     `;
     
     const result = await db.query(sql, [activo ? 1 : 0, id]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 
   /**
@@ -251,8 +250,9 @@ class Empresa {
     ]);
     
     // Si es un INSERT, retorna el ID; si es UPDATE, retorna el ID existente
-    if (result[0].insertId) {
-      return result[0].insertId;
+    const insertId = db.getInsertId(result);
+    if (insertId) {
+      return insertId;
     } else {
       // Para UPDATE, necesitamos obtener el ID existente
       const existing = await db.query(
@@ -276,7 +276,7 @@ class Empresa {
     `;
     
     const result = await db.query(sql, [empresaId, contactoId]);
-    return result[0].affectedRows > 0;
+    return db.getAffectedRows(result) > 0;
   }
 }
 

@@ -1,9 +1,20 @@
+import { useEffect } from 'react'
+
 export default function Modal({ id, title, open, onClose, children, footer }) {
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
   if (!open) return null
 
   return (
     <div
-      className="modal-backdrop"
+      className="modal-backdrop open"
       id={id}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >

@@ -66,6 +66,27 @@ async function query(sql, params = []) {
 }
 
 /**
+ * mysql2 devuelve ResultSetHeader en INSERT/UPDATE/DELETE (no un array).
+ */
+function getMutationMeta(result) {
+  if (result && typeof result.affectedRows === 'number') {
+    return result;
+  }
+  if (Array.isArray(result) && result[0] && typeof result[0].affectedRows === 'number') {
+    return result[0];
+  }
+  return { insertId: 0, affectedRows: 0 };
+}
+
+function getInsertId(result) {
+  return getMutationMeta(result).insertId || 0;
+}
+
+function getAffectedRows(result) {
+  return getMutationMeta(result).affectedRows || 0;
+}
+
+/**
  * Ejecuta una transacción
  * @param {Function} callback - Función que recibe un connection y retorna una promesa
  * @returns {Promise<any>} Resultado de la transacción
@@ -117,5 +138,7 @@ module.exports = {
   transaction,
   testConnection,
   closePool,
-  getPool
+  getPool,
+  getInsertId,
+  getAffectedRows,
 };

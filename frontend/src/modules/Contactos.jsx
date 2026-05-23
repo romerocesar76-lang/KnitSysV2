@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useAppUi } from '../context/AppUiContext'
 import { useData } from '../context/DataContext'
+import { contactoService, empresaService } from '../services/api'
+import { getApiErrorMessage } from '../utils/apiErrors'
 import { mapContactoRow, mapEmpresaRow } from '../utils/mapApi'
 import { filterRows } from '../utils/filterRows'
 
@@ -9,6 +11,29 @@ const mono = { fontFamily: 'var(--font-mono)' }
 export default function Contactos() {
   const { toast, openModal } = useAppUi()
   const { empresas: empresasApi, contactos: contactosApi, loading, error, reload } = useData()
+
+  const handleDeleteEmpresa = async (id, nombre) => {
+    if (!window.confirm(`¿Eliminar la empresa "${nombre}"?`)) return
+    try {
+      await empresaService.delete(id)
+      toast('Empresa eliminada', 'success')
+      await reload({ silent: true })
+    } catch (err) {
+      toast(getApiErrorMessage(err), 'danger')
+    }
+  }
+
+  const handleDeleteContacto = async (id, nombre, apellido) => {
+    const label = [nombre, apellido].filter(Boolean).join(' ')
+    if (!window.confirm(`¿Eliminar el contacto "${label}"?`)) return
+    try {
+      await contactoService.delete(id)
+      toast('Contacto eliminado', 'danger')
+      await reload({ silent: true })
+    } catch (err) {
+      toast(getApiErrorMessage(err), 'danger')
+    }
+  }
   const [activeTab, setActiveTab] = useState('empresas')
   const [searchEmpresas, setSearchEmpresas] = useState('')
   const [searchIndividuos, setSearchIndividuos] = useState('')
@@ -141,7 +166,7 @@ export default function Contactos() {
                           <button
                             type="button"
                             className="btn btn-danger btn-sm"
-                            onClick={() => toast('Empresa eliminada', 'danger')}
+                            onClick={() => handleDeleteEmpresa(e.id, e.nombre)}
                           >
                             🗑️ Eliminar
                           </button>
@@ -228,7 +253,7 @@ export default function Contactos() {
                           <button
                             type="button"
                             className="btn btn-danger btn-sm"
-                            onClick={() => toast('Contacto eliminado', 'danger')}
+                            onClick={() => handleDeleteContacto(c.id, c.nombre, c.apellido)}
                           >
                             🗑️
                           </button>

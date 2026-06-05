@@ -5,6 +5,7 @@ import { contactoService, empresaService } from '../services/api'
 import { getApiErrorMessage } from '../utils/apiErrors'
 import { mapContactoRow, mapEmpresaRow } from '../utils/mapApi'
 import { filterRows } from '../utils/filterRows'
+import TipoContactoModal from '../components/TipoContactoModal'
 
 const mono = { fontFamily: 'var(--font-mono)' }
 
@@ -34,9 +35,11 @@ export default function Contactos() {
       toast(getApiErrorMessage(err), 'danger')
     }
   }
+
   const [activeTab, setActiveTab] = useState('empresas')
   const [searchEmpresas, setSearchEmpresas] = useState('')
   const [searchIndividuos, setSearchIndividuos] = useState('')
+  const [tipoContactoModalOpen, setTipoContactoModalOpen] = useState(false)
 
   const empresasRows = useMemo(
     () => empresasApi.map(mapEmpresaRow),
@@ -70,6 +73,16 @@ export default function Contactos() {
       )}
 
       <div className="card">
+        <div style={{ padding: '1rem', borderBottom: '1px solid var(--border)' }}>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => setTipoContactoModalOpen(true)}
+          >
+            ⚙️ Administrar Tipos de Contactos
+          </button>
+        </div>
+
         <div className="tabs" id="contactos-tabs">
           <div
             className={`tab${activeTab === 'empresas' ? ' active' : ''}`}
@@ -115,63 +128,43 @@ export default function Contactos() {
               + Nueva empresa
             </button>
           </div>
+
           <div className="table-wrap">
             <table id="tbl-empresas">
               <thead>
                 <tr>
+                  <th>ID</th>
                   <th>Nombre</th>
-                  <th>CUIT / RUT / NIF</th>
-                  <th>Condición fiscal</th>
                   <th>Actividad</th>
-                  <th>País</th>
-                  <th>Acciones</th>
+                  <th>Tipo</th>
+                  <th>Creado</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
                       Cargando empresas...
                     </td>
                   </tr>
                 ) : empresas.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
                       No hay empresas registradas
                     </td>
                   </tr>
                 ) : (
                   empresas.map((e) => (
                     <tr key={e.id}>
+                      <td className="text-muted" style={mono}>{e.id}</td>
                       <td>
                         <strong>{e.nombre}</strong>
                       </td>
-                      <td className="text-muted" style={mono}>
-                        {e.cuit}
-                      </td>
-                      <td>
-                        <span className={`pill ${e.condicion.pill}`}>{e.condicion.label}</span>
-                      </td>
                       <td>{e.actividad}</td>
-                      <td>{e.pais}</td>
                       <td>
-                        <div className="flex-gap">
-                          <button
-                            type="button"
-                            className="btn btn-edit btn-sm"
-                            onClick={() => toast('Editando empresa...', 'success')}
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleDeleteEmpresa(e.id, e.nombre)}
-                          >
-                            🗑️ Eliminar
-                          </button>
-                        </div>
+                        <span className={`pill ${e.tipo.pill}`}>{e.tipo.label}</span>
                       </td>
+                      <td className="text-muted">{e.creado_en}</td>
                     </tr>
                   ))
                 )}
@@ -208,57 +201,36 @@ export default function Contactos() {
             <table id="tbl-individuos">
               <thead>
                 <tr>
+                  <th>ID</th>
                   <th>Nombre</th>
                   <th>Apellido</th>
-                  <th>Empresa principal</th>
                   <th>Tipo</th>
-                  <th>Correo</th>
-                  <th>Teléfono</th>
-                  <th>Acciones</th>
+                  <th>Creado</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
                       Cargando contactos...
                     </td>
                   </tr>
                 ) : individuos.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
                       No hay contactos registrados
                     </td>
                   </tr>
                 ) : (
                   individuos.map((c) => (
                     <tr key={c.id}>
+                      <td className="text-muted" style={mono}>{c.id}</td>
                       <td>{c.nombre}</td>
                       <td>{c.apellido}</td>
-                      <td>{c.empresa}</td>
                       <td>
                         <span className={`pill ${c.tipo.pill}`}>{c.tipo.label}</span>
                       </td>
-                      <td>{c.correo}</td>
-                      <td>{c.telefono}</td>
-                      <td>
-                        <div className="flex-gap">
-                          <button
-                            type="button"
-                            className="btn btn-edit btn-sm"
-                            onClick={() => toast('Editando contacto...', 'success')}
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleDeleteContacto(c.id, c.nombre, c.apellido)}
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
+                      <td className="text-muted">{c.creado_en}</td>
                     </tr>
                   ))
                 )}
@@ -267,6 +239,12 @@ export default function Contactos() {
           </div>
         </div>
       </div>
+
+      <TipoContactoModal
+        open={tipoContactoModalOpen}
+        onClose={() => setTipoContactoModalOpen(false)}
+        onSave={() => reload({ silent: true })}
+      />
     </div>
   )
 }

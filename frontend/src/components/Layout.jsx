@@ -41,9 +41,9 @@ export default function Layout({ activeModule, onNavigate, children }) {
       <aside id="sidebar">
         <div className="sidebar-logo">
           <div className="logo-mark">
-            <div className="logo-icon">🧶</div>
+            <div className="logo-icon"><img src="/logo.png" alt="KnitSys Logo" className="h-full" /></div>
             <div>
-              <div className="logo-text">KnitSys</div>
+              <div className="logo-text">KnitSysV2</div>
               <div className="logo-sub">Gestión de producción</div>
             </div>
           </div>

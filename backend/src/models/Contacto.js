@@ -12,58 +12,45 @@ class Contacto {
    * @returns {Promise<Array>} Lista de contactos
    */
   static async findAll(options = {}) {
-    const { page = 1, limit = 20, search = '', tipoContactoId = null, activo } = options;
+    const { page = 1, limit = 20, search = '', tipoContactoId = null } = options;
     const offset = (page - 1) * limit;
     
     let sql = `
       SELECT 
-        c.id,
+        c.id_contacto AS id,
         c.nombre,
         c.apellido,
-        c.nombre_mostrar,
-        c.resumen_notas,
-        c.country_code,
-        c.activo,
+        c.notas,
         c.creado_en,
-        c.actualizado_en,
-        tc.id as tipo_contacto_id,
-        tc.etiqueta as tipo_contacto_etiqueta,
-        u1.nombre_mostrar as creado_por_nombre,
-        u2.nombre_mostrar as actualizado_por_nombre,
-        (SELECT COUNT(*) FROM empresa_contacto ec_cnt WHERE ec_cnt.id_contacto = c.id) as cantidad_empresas,
-        (SELECT GROUP_CONCAT(correo SEPARATOR ', ') 
-         FROM contacto_correos WHERE id_contacto = c.id AND es_principal = 1) as email_principal,
-        (SELECT GROUP_CONCAT(telefono SEPARATOR ', ') 
-         FROM contacto_telefonos WHERE id_contacto = c.id AND es_principal = 1) as telefono_principal,
+        tc.id_tipo_contacto AS tipo_contacto_id,
+        tc.etiqueta AS tipo_contacto_etiqueta,
+        (SELECT COUNT(*) FROM empresa_contacto ec_cnt WHERE ec_cnt.id_contacto = c.id_contacto) as cantidad_empresas,
+        (SELECT GROUP_CONCAT(correo SEPARATOR ', ')
+         FROM correos WHERE id_contacto = c.id_contacto AND es_principal = 1) as email_principal,
+        (SELECT GROUP_CONCAT(telefono SEPARATOR ', ')
+         FROM telefonos WHERE id_contacto = c.id_contacto AND es_principal = 1) as telefono_principal,
         (SELECT e.nombre
          FROM empresas e
-         INNER JOIN empresa_contacto ec_pr ON e.id = ec_pr.id_empresa
-         WHERE ec_pr.id_contacto = c.id AND e.borrado_en IS NULL
+         INNER JOIN empresa_contacto ec_pr ON e.id_empresa = ec_pr.id_empresa
+         WHERE ec_pr.id_contacto = c.id_contacto
          ORDER BY ec_pr.es_principal DESC, e.nombre ASC
          LIMIT 1) as empresa_principal
       FROM contactos c
-      LEFT JOIN tipos_contacto tc ON c.id_tipo_contacto = tc.id
-      LEFT JOIN usuarios u1 ON c.creado_por = u1.id
-      LEFT JOIN usuarios u2 ON c.actualizado_por = u2.id
-      WHERE c.borrado_en IS NULL
+      LEFT JOIN tipos_contacto tc ON c.id_tipo_contacto = tc.id_tipo_contacto
+      WHERE 1 = 1
     `;
     
     const params = [];
     
     if (search) {
-      sql += ` AND (c.nombre LIKE ? OR c.apellido LIKE ? OR c.nombre_mostrar LIKE ?)`;
+      sql += ` AND (c.nombre LIKE ? OR c.apellido LIKE ?)`;
       const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
+      params.push(searchTerm, searchTerm);
     }
     
     if (tipoContactoId) {
       sql += ` AND c.id_tipo_contacto = ?`;
       params.push(tipoContactoId);
-    }
-    
-    if (activo !== undefined) {
-      sql += ` AND c.activo = ?`;
-      params.push(activo ? 1 : 0);
     }
     
     const safeLimit = Math.max(1, parseInt(limit, 10) || 20);
@@ -82,17 +69,17 @@ class Contacto {
   static async findById(id) {
     const sql = `
       SELECT 
-        c.*,
-        tc.id as tipo_contacto_id,
-        tc.etiqueta as tipo_contacto_etiqueta,
-        tc.descripcion as tipo_contacto_descripcion,
-        u1.nombre_mostrar as creado_por_nombre,
-        u2.nombre_mostrar as actualizado_por_nombre
+        c.id_contacto AS id,
+        c.nombre,
+        c.apellido,
+        c.notas,
+        c.creado_en,
+        tc.id_tipo_contacto AS tipo_contacto_id,
+        tc.etiqueta AS tipo_contacto_etiqueta,
+        tc.descripcion AS tipo_contacto_descripcion
       FROM contactos c
-      LEFT JOIN tipos_contacto tc ON c.id_tipo_contacto = tc.id
-      LEFT JOIN usuarios u1 ON c.creado_por = u1.id
-      LEFT JOIN usuarios u2 ON c.actualizado_por = u2.id
-      WHERE c.id = ? AND c.borrado_en IS NULL
+      LEFT JOIN tipos_contacto tc ON c.id_tipo_contacto = tc.id_tipo_contacto
+      WHERE c.id_contacto = ?
     `;
     
     const rows = await db.query(sql, [id]);
@@ -106,8 +93,8 @@ class Contacto {
    */
   static async findEmails(contactoId) {
     const sql = `
-      SELECT id, correo, tipo, es_principal, verificado, creado_en
-      FROM contacto_correos
+      SELECT id_correo AS id, correo, tipo, es_principal, creado_en
+      FROM correos
       WHERE id_contacto = ?
       ORDER BY es_principal DESC, correo ASC
     `;
@@ -122,8 +109,8 @@ class Contacto {
    */
   static async findTelefonos(contactoId) {
     const sql = `
-      SELECT id, telefono, country_code, tipo, es_principal, creado_en
-      FROM contacto_telefonos
+      SELECT id_telefono AS id, telefono, country_code, tipo, es_principal, creado_en
+      FROM telefonos
       WHERE id_contacto = ?
       ORDER BY es_principal DESC, telefono ASC
     `;
@@ -139,15 +126,15 @@ class Contacto {
   static async findEmpresas(contactoId) {
     const sql = `
       SELECT 
-        e.id,
+        e.id_empresa AS id,
         e.nombre,
         e.cuit_rut_nif,
         ec.puesto,
         ec.es_principal,
         ec.notas
       FROM empresas e
-      INNER JOIN empresa_contacto ec ON e.id = ec.id_empresa
-      WHERE ec.id_contacto = ? AND e.borrado_en IS NULL
+      INNER JOIN empresa_contacto ec ON e.id_empresa = ec.id_empresa
+      WHERE ec.id_contacto = ?
       ORDER BY ec.es_principal DESC, e.nombre ASC
     `;
     
@@ -160,110 +147,58 @@ class Contacto {
    * @returns {Promise<number>} ID del contacto creado
    */
   static async create(data) {
-    const {
-      nombre,
-      apellido,
-      nombre_mostrar,
-      id_tipo_contacto,
-      resumen_notas,
-      country_code,
-      creado_por
-    } = data;
-    
+    const { nombre, apellido, id_tipo_contacto, notas } = data;
     const sql = `
-      INSERT INTO contactos 
-      (nombre, apellido, nombre_mostrar, id_tipo_contacto, resumen_notas, country_code, creado_por)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO contactos
+      (nombre, apellido, id_tipo_contacto, notas)
+      VALUES (?, ?, ?, ?)
     `;
-    
+
     const result = await db.query(sql, [
       nombre || null,
       apellido || null,
-      nombre_mostrar || null,
       id_tipo_contacto || null,
-      resumen_notas || null,
-      country_code || null,
-      creado_por || null
+      notas || null
     ]);
-    
+
     return db.getInsertId(result);
   }
 
-  /**
-   * Actualiza un contacto
-   * @param {number} id - ID del contacto
-   * @param {Object} data - Datos a actualizar
-   * @param {number} actualizado_por - ID del usuario que actualiza
-   * @returns {Promise<boolean>} True si se actualizó
-   */
-  static async update(id, data, actualizado_por = null) {
-    const {
-      nombre,
-      apellido,
-      nombre_mostrar,
-      id_tipo_contacto,
-      resumen_notas,
-      country_code
-    } = data;
-    
+  static async update(id, data) {
+    const { nombre, apellido, id_tipo_contacto, notas } = data;
     const sql = `
-      UPDATE contactos 
-      SET 
+      UPDATE contactos
+      SET
         nombre = ?,
         apellido = ?,
-        nombre_mostrar = ?,
         id_tipo_contacto = ?,
-        resumen_notas = ?,
-        country_code = ?,
-        actualizado_por = ?
-      WHERE id = ?
+        notas = ?
+      WHERE id_contacto = ?
     `;
-    
+
     const result = await db.query(sql, [
       nombre || null,
       apellido || null,
-      nombre_mostrar || null,
       id_tipo_contacto || null,
-      resumen_notas || null,
-      country_code || null,
-      actualizado_por || null,
+      notas || null,
       id
     ]);
-    
+
     return db.getAffectedRows(result) > 0;
   }
 
-  /**
-   * Elimina lógicamente un contacto (soft delete)
-   * @param {number} id - ID del contacto
-   * @returns {Promise<boolean>} True si se eliminó
-   */
   static async delete(id) {
     const sql = `
-      UPDATE contactos 
-      SET borrado_en = NOW()
-      WHERE id = ? AND borrado_en IS NULL
+      DELETE FROM contactos
+      WHERE id_contacto = ?
     `;
-    
+
     const result = await db.query(sql, [id]);
     return db.getAffectedRows(result) > 0;
   }
 
-  /**
-   * Activa o desactiva un contacto
-   * @param {number} id - ID del contacto
-   * @param {boolean} activo - Estado activo/inactivo
-   * @returns {Promise<boolean>} True si se actualizó
-   */
   static async toggleActivo(id, activo) {
-    const sql = `
-      UPDATE contactos 
-      SET activo = ?
-      WHERE id = ? AND borrado_en IS NULL
-    `;
-    
-    const result = await db.query(sql, [activo ? 1 : 0, id]);
-    return db.getAffectedRows(result) > 0;
+    return false;
   }
 
   /**
@@ -273,28 +208,26 @@ class Contacto {
    * @returns {Promise<number>} ID del email creado
    */
   static async addEmail(contactoId, data) {
-    const { correo, tipo = 'personal', es_principal = 0, verificado = 0 } = data;
+    const { correo, tipo = 'personal', es_principal = 0 } = data;
     
-    // Si es principal, desmarcar los demás
     if (es_principal) {
       await db.query(
-        'UPDATE contacto_correos SET es_principal = 0 WHERE id_contacto = ?',
+        'UPDATE correos SET es_principal = 0 WHERE id_contacto = ?',
         [contactoId]
       );
     }
     
     const sql = `
-      INSERT INTO contacto_correos 
-      (id_contacto, correo, tipo, es_principal, verificado)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO correos
+      (id_contacto, correo, tipo, es_principal)
+      VALUES (?, ?, ?, ?)
     `;
     
     const result = await db.query(sql, [
       contactoId,
       correo,
       tipo,
-      es_principal ? 1 : 0,
-      verificado ? 1 : 0
+      es_principal ? 1 : 0
     ]);
     
     return db.getInsertId(result);
@@ -308,8 +241,8 @@ class Contacto {
    */
   static async removeEmail(contactoId, emailId) {
     const sql = `
-      DELETE FROM contacto_correos 
-      WHERE id_contacto = ? AND id = ?
+      DELETE FROM correos
+      WHERE id_contacto = ? AND id_correo = ?
     `;
     
     const result = await db.query(sql, [contactoId, emailId]);
@@ -325,16 +258,15 @@ class Contacto {
   static async addTelefono(contactoId, data) {
     const { telefono, country_code = null, tipo = 'movil', es_principal = 0 } = data;
     
-    // Si es principal, desmarcar los demás
     if (es_principal) {
       await db.query(
-        'UPDATE contacto_telefonos SET es_principal = 0 WHERE id_contacto = ?',
+        'UPDATE telefonos SET es_principal = 0 WHERE id_contacto = ?',
         [contactoId]
       );
     }
     
     const sql = `
-      INSERT INTO contacto_telefonos 
+      INSERT INTO telefonos
       (id_contacto, telefono, country_code, tipo, es_principal)
       VALUES (?, ?, ?, ?, ?)
     `;
@@ -358,8 +290,8 @@ class Contacto {
    */
   static async removeTelefono(contactoId, telefonoId) {
     const sql = `
-      DELETE FROM contacto_telefonos 
-      WHERE id_contacto = ? AND id = ?
+      DELETE FROM telefonos
+      WHERE id_contacto = ? AND id_telefono = ?
     `;
     
     const result = await db.query(sql, [contactoId, telefonoId]);

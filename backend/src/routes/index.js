@@ -9,6 +9,7 @@ const router = express.Router();
 // Controladores
 const empresaController = require('../controllers/empresaController');
 const contactoController = require('../controllers/contactoController');
+const tipoContactoController = require('../controllers/tipoContactoController');
 
 /**
  * @route   GET /api/
@@ -192,5 +193,45 @@ router.post('/contactos/:id/telefonos', contactoController.addTelefono);
  * @access  Public (requiere autenticación en producción)
  */
 router.delete('/contactos/:id/telefonos/:telefonoId', contactoController.removeTelefono);
+
+// ═══════════════════════════════════════════
+// Rutas de Tipos de Contacto
+// ═══════════════════════════════════════════
+
+/**
+ * @route   GET /api/tipos-contacto
+ * @desc    Obtener todos los tipos de contacto
+ * @access  Public
+ */
+router.get('/tipos-contacto', tipoContactoController.getAll);
+
+/**
+ * @route   GET /api/tipos-contacto/:id
+ * @desc    Obtener tipo de contacto por ID
+ * @access  Public
+ */
+router.get('/tipos-contacto/:id', tipoContactoController.getById);
+
+/**
+ * @route   POST /api/tipos-contacto
+ * @desc    Crear nuevo tipo de contacto
+ * @access  Public (requiere autenticación en producción)
+ * @body    etiqueta, descripcion
+ */
+router.post('/tipos-contacto', tipoContactoController.create);
+
+/**
+ * @route   PUT /api/tipos-contacto/:id
+ * @desc    Actualizar tipo de contacto
+ * @access  Public (requiere autenticación en producción)
+ */
+router.put('/tipos-contacto/:id', tipoContactoController.update);
+
+/**
+ * @route   DELETE /api/tipos-contacto/:id
+ * @desc    Eliminar tipo de contacto
+ * @access  Public (requiere autenticación en producción)
+ */
+router.delete('/tipos-contacto/:id', tipoContactoController.delete);
 
 module.exports = router;

@@ -54,11 +54,10 @@ export function tipoToPill(etiqueta) {
 export function mapEmpresaRow(e) {
   return {
     id: e.id,
-    nombre: e.nombre,
-    cuit: e.cuit_rut_nif || '—',
-    condicion: condicionToPill(e.condicion_fiscal),
+    nombre: e.nombre || '—',
     actividad: e.actividad_economica || '—',
-    pais: formatCountry(e.country_code),
+    tipo: tipoToPill(e.tipo_contacto),
+    creado_en: e.creado_en || '—',
     _raw: e,
   }
 }
@@ -71,6 +70,7 @@ export function mapContactoRow(c) {
     apellido: c.apellido || '—',
     empresa: c.empresa_principal || '—',
     tipo: tipoToPill(c.tipo_contacto_etiqueta),
+    creado_en: c.creado_en || '—',
     correo: c.email_principal || '—',
     telefono: c.telefono_principal || '—',
     _raw: c,

@@ -35,7 +35,7 @@ export function DataProvider({ children }) {
       console.error('Error cargando datos KnitSys:', err)
       const message = err.response
         ? getApiErrorMessage(err)
-        : 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo (puerto 3001).'
+        : 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo y que la URL de la API esté configurada correctamente.'
       if (!silent) {
         setError(message)
         setEmpresas([])

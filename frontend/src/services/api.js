@@ -151,8 +151,37 @@ export const contactoService = {
   },
 };
 
+// ═══════════════════════════════════════════// SERVICIO DE TIPOS DE CONTACTO
 // ═══════════════════════════════════════════
-// SERVICIO DE HEALTH CHECK
+
+export const tipoContactoService = {
+  // Obtener todos los tipos de contacto
+  getAll: () => {
+    return api.get('/tipos-contacto');
+  },
+
+  // Obtener tipo de contacto por ID
+  getById: (id) => {
+    return api.get(`/tipos-contacto/${id}`);
+  },
+
+  // Crear tipo de contacto
+  create: (data) => {
+    return api.post('/tipos-contacto', data);
+  },
+
+  // Actualizar tipo de contacto
+  update: (id, data) => {
+    return api.put(`/tipos-contacto/${id}`, data);
+  },
+
+  // Eliminar tipo de contacto
+  delete: (id) => {
+    return api.delete(`/tipos-contacto/${id}`);
+  },
+};
+
+// ═══════════════════════════════════════════// SERVICIO DE HEALTH CHECK
 // ═══════════════════════════════════════════
 
 export const healthService = {
